@@ -139,6 +139,7 @@ if __name__ == '__main__':
     conf = {
         '/': {
             'tools.sessions.on': True,
+            'tools.sessions.timeout': 10080, # 1 week
             'tools.staticdir.root': os.path.abspath(os.getcwd())
         },
         '/static': {
