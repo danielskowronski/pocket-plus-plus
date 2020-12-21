@@ -1,4 +1,4 @@
-# Pocket++ `[work-in-progress]`
+# Pocket++
 A web-app to extend Mozilla's Pocket for people dealing with dozens of saved content. 
 
 Main features include:
@@ -7,6 +7,7 @@ Main features include:
   * idea that'll be implemented later: track count and time changes in InfluxDB
 * random article selection - when you just can't decide
 
+## Demo
 ![Demo of application](demo.png)
 
 ## Installation
