@@ -146,4 +146,5 @@ if __name__ == '__main__':
             'tools.staticdir.dir': os.path.abspath(os.getcwd())+'/static/'
         }
     }
+    cherrypy.server.socket_host = '0.0.0.0'
     cherrypy.quickstart(PocketPlusPlus(), '/', conf)
