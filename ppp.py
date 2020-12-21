@@ -1,41 +1,48 @@
 #!python3
-import os, sys
-import yaml, json
+import os
+import sys
+import yaml
+import json
 from termcolor import colored
 import cherrypy
 import pocket
 from pprint import pprint
 
-_app_cfg=None
+_app_cfg = None
+
 
 def debugPrint(msg):
     if not _app_cfg['debug']:
         return
-    print(colored('[DEBUG] %s'%msg, 'cyan'))
+    print(colored('[DEBUG] %s' % msg, 'cyan'))
+
 
 def errorDisplay(title, exception_instance):
     return '<h1 style="color: red">ERROR in %s</h1><pre>%s</pre' % (title, str(exception_instance))
 
-def redirect(url):
-	return '<script>window.location.replace("%s")</script>' % url
 
-if len(sys.argv)==3:
-    _master_rt=sys.argv[1]
-    _master_at=sys.argv[2]
-    _master_tokens=True
+def redirect(url):
+    return '<script>window.location.replace("%s")</script>' % url
+
+
+if len(sys.argv) == 3:
+    _master_rt = sys.argv[1]
+    _master_at = sys.argv[2]
+    _master_tokens = True
 else:
-    _master_tokens=False
+    _master_tokens = False
+
 
 def getSessionItemOrEmpty(name):
-    if _master_tokens and name=='request_token':
+    if _master_tokens and name == 'request_token':
         return _master_rt
-    if _master_tokens and name=='access_token':
+    if _master_tokens and name == 'access_token':
         return _master_at
 
     try:
-        x=cherrypy.session[name]
+        x = cherrypy.session[name]
     except:
-        x=''
+        x = ''
 
     return x
 
@@ -45,36 +52,39 @@ class PocketPlusPlus(object):
     # AUTH TO POCKET
     #
     @cherrypy.expose
-    def callback(self,*args):
+    def callback(self, *args):
         try:
-            user_credentials = pocket.Pocket.get_credentials(consumer_key=_app_cfg['consumer_key'], code=cherrypy.session['request_token'])
+            user_credentials = pocket.Pocket.get_credentials(
+                consumer_key=_app_cfg['consumer_key'], code=cherrypy.session['request_token'])
         except Exception as e:
             return errorDisplay('received credentials validation', e)
 
         access_token = user_credentials['access_token']
-        cherrypy.session['access_token']=access_token
+        cherrypy.session['access_token'] = access_token
         cherrypy.session.save()
 
-        debugPrint('ACCESS_TOKEN=%s'%(access_token))
-        
+        debugPrint('ACCESS_TOKEN=%s' % (access_token))
+
         return redirect('/')
 
-    @cherrypy.expose    
+    @cherrypy.expose
     def login(self):
         try:
-            request_token = pocket.Pocket.get_request_token(consumer_key=_app_cfg['consumer_key'], redirect_uri=_app_cfg['redirect_uri'])
+            request_token = pocket.Pocket.get_request_token(
+                consumer_key=_app_cfg['consumer_key'], redirect_uri=_app_cfg['redirect_uri'])
         except Exception as e:
             return errorDisplay('session credentials validation', e)
 
-        cherrypy.session['request_token']=request_token
+        cherrypy.session['request_token'] = request_token
         cherrypy.session.save()
 
         try:
-            auth_url = pocket.Pocket.get_auth_url(code=request_token, redirect_uri=_app_cfg['redirect_uri'])
+            auth_url = pocket.Pocket.get_auth_url(
+                code=request_token, redirect_uri=_app_cfg['redirect_uri'])
         except Exception as e:
-            return errorDisplay('auth url generation', e)  
+            return errorDisplay('auth url generation', e)
 
-        debugPrint('REQUEST_TOKEN= %s'%(request_token))
+        debugPrint('REQUEST_TOKEN= %s' % (request_token))
 
         return redirect(auth_url)
 
@@ -89,26 +99,26 @@ class PocketPlusPlus(object):
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def verify(self):
-        status={'authenticated': False}
+        status = {'authenticated': False}
 
-        at=getSessionItemOrEmpty('access_token')
-        if at!='':
-            try: 
+        at = getSessionItemOrEmpty('access_token')
+        if at != '':
+            try:
                 pocket_instance = pocket.Pocket(_app_cfg['consumer_key'], at)
-                resp=pocket_instance.get(state='unread',count=1)
+                resp = pocket_instance.get(state='unread', count=1)
             except pocket.AuthException:
-                status={'authenticated': False}
+                status = {'authenticated': False}
             else:
-                status={'authenticated': True}
+                status = {'authenticated': True}
 
         return status
 
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def articles(self):
-        at=getSessionItemOrEmpty('access_token')
+        at = getSessionItemOrEmpty('access_token')
         pocket_instance = pocket.Pocket(_app_cfg['consumer_key'], at)
-        articles=pocket_instance.get(state='unread',detail=True)[0]['list']
+        articles = pocket_instance.get(state='unread', detail=True)[0]['list']
 
         return articles
 
@@ -118,6 +128,7 @@ class PocketPlusPlus(object):
     @cherrypy.expose
     def index(self):
         return open('index.html')
+
 
 if __name__ == '__main__':
     stream = open('config.yml', 'r')
