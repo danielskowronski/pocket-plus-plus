@@ -78,9 +78,9 @@
         if (title=='') title="[title unknown]";
 
         var articleRow=`<tr>`+
-            `<td data-sortValue="${timestamp}">${added}</td>`+
-            `<td data-sortValue="${words}">${words}</td>`+
-            `<td data-sortValue="${minutes}">${minutes} min</td>`+
+            `<td>${added}</td>`+
+            `<td class="words">${words}</td>`+
+            `<td class="minutes">${minutes} min</td>`+
             `<td><a href='${url}'>${title}</a></td>`+
             `</tr>`;
         

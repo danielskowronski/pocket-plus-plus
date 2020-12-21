@@ -37,3 +37,10 @@ table, th, td {
 th {
     padding-right: 15px; /* for sorTable.js */
 }
+
+td.words{
+    text-align: center !important; 
+}
+td.minutes{
+    text-align: right !important;
+}
