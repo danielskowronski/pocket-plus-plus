@@ -45,7 +45,9 @@
             $(".onlyAfterAuth").show();
 
             for([key, val] of Object.entries(data)) {
-                addArticleToTable(val)
+                if (data.is_article!=0){
+                    addArticleToTable(val)
+                }
             }
 
             $("#articleCount").html(window.articleCount);
