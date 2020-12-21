@@ -5,16 +5,27 @@ pre, kbd{
     font-family: 'Ubuntu Mono', monospace;
 }
 
+.onlyAfterAuth{
+    display: none;    
+}
+
 #authenticated{
     font-family: 'Ubuntu Mono', monospace;
     color: orange;
+}
+
+#random{
+    padding: 5px;
+    background: purple;
+    color: white;
+    text-decoration: none;
 }
 
 #articleCount, #timeToRead, #wordsToRead{
     font-family: 'Ubuntu Mono', monospace;
 }
 
-#counters, #articlesTable{
+#articlesTable{
     display: none;
     border-collapse: collapse;
 }

@@ -42,8 +42,7 @@
 
     function fetchArticles(){
         $.get( "articles", function( data ) {
-            $("#articlesTable").show();
-            $("#counters").show();
+            $(".onlyAfterAuth").show();
 
             for([key, val] of Object.entries(data)) {
                 addArticleToTable(val)
@@ -90,6 +89,14 @@
         window.wordsToRead+=words;
     }
 
+    function selectRandom(){
+        var articles=$("#articlesTable tbody").children();
+        var random=Math.floor((Math.random() * articles.length));
+        var url=$($(articles[random]).children()[3].children[0]).attr("href")
+        window.open(url, '_blank');
+        $(articles[random]).remove()
+    }
+
     $(function() {
         $.get( "verify", function( data ) {
             if (data.authenticated==true){
@@ -107,9 +114,13 @@
 </script>
 
 <h1>Pocket++ <span id="authenticated">[status not yet known]</span></h1>
-<h3 id="counters">Library counters:<br /><span id="articleCount">??</span> articles = <span id="wordsToRead">??</span> words = <span id="timeToRead">??</span></h3>
 
-<table id="articlesTable" class="sortable-table">
+<h3 class="onlyAfterAuth"><a id="random" onClick="selectRandom()">Select random article</a></h3>
+
+<h3 class="onlyAfterAuth" id="counters">Library counters:<br /><span id="articleCount">??</span> articles = <span id="wordsToRead">??</span> words = <span id="timeToRead">??</span></h3>
+
+
+<table class="onlyAfterAuth" id="articlesTable" class="sortable-table">
 <thead>
     <tr>
         <th>Date added</th>
