@@ -45,7 +45,7 @@
             $(".onlyAfterAuth").show();
 
             for([key, val] of Object.entries(data)) {
-                if (data.is_article!=0){
+                if (val.is_article=="1"){
                     addArticleToTable(val)
                 }
             }
