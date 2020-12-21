@@ -1,4 +1,4 @@
-# Pocket++
+# ![](static/logo.png =100x100) Pocket++
 A web-app to extend Mozilla's Pocket for people dealing with dozens of saved content. 
 
 Main features include:
