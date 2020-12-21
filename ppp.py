@@ -103,6 +103,15 @@ class PocketPlusPlus(object):
 
         return status
 
+    @cherrypy.expose
+    @cherrypy.tools.json_out()
+    def articles(self):
+        at=getSessionItemOrEmpty('access_token')
+        pocket_instance = pocket.Pocket(_app_cfg['consumer_key'], at)
+        articles=pocket_instance.get(state='unread',detail=True)[0]['list']
+
+        return articles
+
     #
     # views
     #
