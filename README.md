@@ -6,3 +6,12 @@ Main features include:
 * time and count statistics - to track progress of reading and/or saving new stuff
   * idea that'll be implemented later: track count and time changes in InfluxDB
 * random article selection - when you just can't decide
+
+
+## Installation
+```
+python3 -m pip install -r requirements.txt
+```
+
+## Setup
+...
