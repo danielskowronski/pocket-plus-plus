@@ -1,0 +1,24 @@
+html, body{
+    font-family: 'Ubuntu', sans-serif;
+}
+pre, kbd{
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+#authenticated{
+    font-family: 'Ubuntu Mono', monospace;
+    color: orange;
+}
+
+#articlesTable{
+    display: none;
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 2px solid black;
+    padding: 5px;
+}
+th {
+    padding-right: 15px; /* for sorTable.js */
+}
