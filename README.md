@@ -28,5 +28,14 @@ app_cfg:
 
 You need `$TOKEN` being *consumer key* from https://getpocket.com/developer/apps/
 
-## Setup
-...
+## Usage
+```
+python3 ppp.py
+```
+
+## Development
+You may want to use below syntax to skip getpocket.com authorization every time you restart app (or after it's autorestarted by CherryPy):
+```
+python3 ppp.py $REQUEST_TOKEN $ACCESS_TOKEN
+```
+`$REQUEST_TOKEN` and `$ACCESS_TOKEN` can be found in application log when `debug: true`.
