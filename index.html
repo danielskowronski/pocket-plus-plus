@@ -15,17 +15,44 @@
 <body>
 
 <script type="text/javascript">
+    window.articleCount=0;
+    window.timeToRead=0;
+    window.wordsToRead=0;
+
     function zeroPad(x){
         if (x<10) return `0${x}`;
         else return x;
+    }
+    function formatMinutes(x){
+        if (x<60) {
+            return `${x} minutes`;
+        }
+        else {
+            return `${parseInt(x/60)}hrs ${x%60}mins`;
+        }
+    }
+    function formatWords(x){
+        if (x<1000) {
+            return x;
+        }
+        else {
+            return `${parseInt(x/1000)}k`;
+        }
     }
 
     function fetchArticles(){
         $.get( "articles", function( data ) {
             $("#articlesTable").show();
+            $("#counters").show();
+
             for([key, val] of Object.entries(data)) {
                 addArticleToTable(val)
             }
+
+            $("#articleCount").html(window.articleCount);
+            $("#timeToRead").html(formatMinutes(window.timeToRead));
+            $("#wordsToRead").html(formatWords(window.wordsToRead));
+
             addTableSorting();
         })
     }
@@ -52,11 +79,15 @@
         var articleRow=`<tr>`+
             `<td data-sortValue="${timestamp}">${added}</td>`+
             `<td data-sortValue="${words}">${words}</td>`+
-            `<td data-sortValue="${minutes}">${minutes}m</td>`+
+            `<td data-sortValue="${minutes}">${minutes} min</td>`+
             `<td><a href='${url}'>${title}</a></td>`+
             `</tr>`;
         
         $("#articlesTable tbody").append(articleRow);
+
+        window.articleCount+=1;
+        window.timeToRead+=minutes;
+        window.wordsToRead+=words;
     }
 
     $(function() {
@@ -76,6 +107,7 @@
 </script>
 
 <h1>Pocket++ <span id="authenticated">[status not yet known]</span></h1>
+<h3 id="counters">Library counters:<br /><span id="articleCount">??</span> articles = <span id="wordsToRead">??</span> words = <span id="timeToRead">??</span></h3>
 
 <table id="articlesTable" class="sortable-table">
 <thead>

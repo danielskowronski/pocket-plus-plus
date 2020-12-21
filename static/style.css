@@ -10,7 +10,11 @@ pre, kbd{
     color: orange;
 }
 
-#articlesTable{
+#articleCount, #timeToRead, #wordsToRead{
+    font-family: 'Ubuntu Mono', monospace;
+}
+
+#counters, #articlesTable{
     display: none;
     border-collapse: collapse;
 }
