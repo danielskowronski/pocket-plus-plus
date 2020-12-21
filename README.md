@@ -13,5 +13,20 @@ Main features include:
 python3 -m pip install -r requirements.txt
 ```
 
+## Config
+You must use `config.yml` looking like this:
+
+```
+---
+app_cfg:
+  debug: true
+  port: 8080
+  consumer_key: '$TOKEN'
+  redirect_uri: 'http://localhost:8080/callback'
+
+```
+
+You need `$TOKEN` being *consumer key* from https://getpocket.com/developer/apps/
+
 ## Setup
 ...
