@@ -75,6 +75,7 @@
         var words=parseInt(article.word_count);
         var minutes=parseInt(article.time_to_read);
         var title=article.resolved_title;
+        var domain=article.resolved_url.replace('http://','').replace('https://','').split(/[/?#]/)[0].replace('www.','');
         var url=`https://app.getpocket.com/read/${id}`;
 
         if (isNaN(minutes)) minutes=0;
@@ -84,6 +85,7 @@
             `<td>${added}</td>`+
             `<td class="words">${words}</td>`+
             `<td class="minutes">${minutes} min</td>`+
+            `<td class="domain">${domain}</td>`+
             `<td><a href='${url}'>${title}</a></td>`+
             `</tr>`;
         
@@ -131,6 +133,7 @@
         <th>Date added</th>
         <th class="numeric-sort">Word count</th>
         <th class="numeric-sort">Time to read</th>
+        <th>Domain</th>
         <th>Title</th>
     </tr>
 </thead>

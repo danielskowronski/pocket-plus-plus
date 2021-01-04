@@ -44,3 +44,8 @@ td.words{
 td.minutes{
     text-align: right !important;
 }
+
+td.domain{
+    text-align: right !important;
+    font-size: x-small;
+}
