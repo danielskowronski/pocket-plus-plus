@@ -76,7 +76,7 @@
         var minutes=parseInt(article.time_to_read);
         var title=article.resolved_title;
         var domain=article.resolved_url.replace('http://','').replace('https://','').split(/[/?#]/)[0].replace('www.','');
-        var url=`https://app.getpocket.com/read/${id}`;
+        var url=`https://getpocket.com/read/${id}`;
 
         if (isNaN(minutes)) minutes=0;
         if (title=='') title="[title unknown]";
