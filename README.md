@@ -6,6 +6,7 @@ Main features include:
 * time and count statistics - to track progress of reading and/or saving new stuff
   * idea that'll be implemented later: track count and time changes in InfluxDB
 * random article selection - when you just can't decide
+* optional storing statistics in InfluxDB
 
 ## Demo
 ![Demo of application](demo.png)
@@ -25,7 +26,13 @@ app_cfg:
   port: 8080
   consumer_key: '$TOKEN'
   redirect_uri: 'http://localhost:8080/callback'
-
+influx_cfg:
+  enabled: true
+  host: influx_host
+  port: 8086
+  db: ppp
+  user: username
+  pass: secretpass
 ```
 
 You need `$TOKEN` being *consumer key* from https://getpocket.com/developer/apps/
@@ -38,6 +45,6 @@ python3 ppp.py
 ## Development
 You may want to use below syntax to skip getpocket.com authorization every time you restart app (or after it's autorestarted by CherryPy):
 ```
-python3 ppp.py $REQUEST_TOKEN $ACCESS_TOKEN
+python3 ppp.py $REQUEST_TOKEN $ACCESS_TOKEN $USERNAME
 ```
-`$REQUEST_TOKEN` and `$ACCESS_TOKEN` can be found in application log when `debug: true`.
+`$REQUEST_TOKEN`, `$ACCESS_TOKEN`  and `$USERNAME` can be found in application log when `debug: true`.

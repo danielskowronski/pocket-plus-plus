@@ -7,6 +7,7 @@ from termcolor import colored
 import cherrypy
 import pocket
 from pprint import pprint
+from influxdb import InfluxDBClient
 
 _app_cfg = None
 
@@ -25,9 +26,10 @@ def redirect(url):
     return '<script>window.location.replace("%s")</script>' % url
 
 
-if len(sys.argv) == 3:
+if len(sys.argv) == 4:
     _master_rt = sys.argv[1]
     _master_at = sys.argv[2]
+    _master_un = sys.argv[3]
     _master_tokens = True
 else:
     _master_tokens = False
@@ -38,6 +40,8 @@ def getSessionItemOrEmpty(name):
         return _master_rt
     if _master_tokens and name == 'access_token':
         return _master_at
+    if _master_tokens and name == 'username':
+        return _master_un
 
     try:
         x = cherrypy.session[name]
@@ -45,6 +49,39 @@ def getSessionItemOrEmpty(name):
         x = ''
 
     return x
+
+def processStatistics(articles_data):
+    time=0
+    words=0
+    articles=0
+
+    for article in articles_data.values():
+        try:
+            time +=int(article['time_to_read'])
+        except:
+            pass
+        
+        try:
+            words+=int(article['word_count'])
+        except:
+            pass
+        
+        articles+=1
+
+    return time, words, articles
+
+def storeStatsToInfluxDB(username,time,words,articles):
+    if _influx_cfg['enabled']!=True:
+        return
+
+    debugPrint('Storing stats to InfluxDB: series=%s minutes=%d words=%d articles=%d'%(username,time,words,articles))
+    
+    client=InfluxDBClient(_influx_cfg['host'], _influx_cfg['port'], _influx_cfg['user'], _influx_cfg['pass'], _influx_cfg['db'])
+    status=client.write_points([{
+        "measurement":username, 
+        "fields":{"minutes":time, "words":words, "articles":articles}}])
+    debugPrint('Response from InfluxDB: %s'%(status))
+    return True
 
 
 class PocketPlusPlus(object):
@@ -61,9 +98,14 @@ class PocketPlusPlus(object):
 
         access_token = user_credentials['access_token']
         cherrypy.session['access_token'] = access_token
+        
+        username = user_credentials['username']
+        cherrypy.session['username'] = username
+
         cherrypy.session.save()
 
-        debugPrint('ACCESS_TOKEN=%s' % (access_token))
+        debugPrint('ACCESS_TOKEN= %s' % (access_token))
+        debugPrint('USERNAME= %s' % (username))
 
         return redirect('/')
 
@@ -118,9 +160,13 @@ class PocketPlusPlus(object):
     def articles(self):
         at = getSessionItemOrEmpty('access_token')
         pocket_instance = pocket.Pocket(_app_cfg['consumer_key'], at)
-        articles = pocket_instance.get(state='unread', detail=True)[0]['list']
+        articles_data = pocket_instance.get(state='unread', detail=True)[0]['list']
 
-        return articles
+        username = getSessionItemOrEmpty('username')
+        time, words, count = processStatistics(articles_data)
+        storeStatsToInfluxDB(username, time,words,count)
+
+        return articles_data
 
     #
     # views
@@ -131,8 +177,10 @@ class PocketPlusPlus(object):
 
 
 if __name__ == '__main__':
-    stream = open('config.yml', 'r')
-    _app_cfg = yaml.load(stream, Loader=yaml.SafeLoader)['app_cfg']
+    stream      = open('config.yml', 'r')
+    loadedFile  = yaml.load(stream, Loader=yaml.SafeLoader)
+    _app_cfg    = loadedFile['app_cfg']
+    _influx_cfg = loadedFile['influx_cfg']
 
     debugPrint('Config loaded')
 

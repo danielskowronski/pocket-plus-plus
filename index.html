@@ -48,9 +48,9 @@
             $(".onlyAfterAuth").show();
 
             for([key, val] of Object.entries(data)) {
-                if (val.is_article=="1"){
+                //if (val.is_article=="1"){
                     addArticleToTable(val)
-                }
+                //}
             }
 
             $("#articleCount").html(window.articleCount);
