@@ -60,7 +60,34 @@
             addTableSorting();
         })
     }
+    function getDomain(url){
+        return url.replace('http://','').replace('https://','').split(/[/?#]/)[0].replace('www.','')
+    }
+    function getUrl(article){
+        if (article.resolved_url){
+            return getDomain(article.resolved_url);
+        }
+        else if (article.given_url){
+            return getDomain(article.given_url);
+        }
+        else {
+            return "N/A";
+        }
+    }
+    function getTitle(article){
+        if (article.resolved_title){
+            return article.resolved_title;
+        }
+        else if (article.given_title){
+            return article.given_title;
+        }
+        else {
+            return "N/A";
+        }        
+    }
     function addArticleToTable(article){
+        if (isNaN(parseInt(article.word_count))) return;
+
         var dateObject = new Date();
         dateObject.setTime(article.time_added*1000);
         var year = dateObject.getFullYear();
@@ -74,8 +101,8 @@
         var added=`${year}-${month}-${day} ${hour}:${minutes}`;
         var words=parseInt(article.word_count);
         var minutes=parseInt(article.time_to_read);
-        var title=article.resolved_title;
-        var domain=article.resolved_url.replace('http://','').replace('https://','').split(/[/?#]/)[0].replace('www.','');
+        var title=getTitle(article);
+        var domain=getUrl(article);
         var url=`https://getpocket.com/read/${id}`;
 
         if (isNaN(minutes)) minutes=0;
