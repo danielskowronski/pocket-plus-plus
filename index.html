@@ -47,9 +47,11 @@
         $.get( "articles", function( data ) {
             $(".onlyAfterAuth").show();
 
+            var i=0;
             for([key, val] of Object.entries(data)) {
+                i++;
                 //if (val.is_article=="1"){
-                    addArticleToTable(val)
+                    addArticleToTable(val, i%2)
                 //}
             }
 
@@ -75,17 +77,21 @@
         }
     }
     function getTitle(article){
+        var title = "N/A";
+
         if (article.resolved_title){
-            return article.resolved_title;
+            title = article.resolved_title;
         }
         else if (article.given_title){
-            return article.given_title;
+            title = article.given_title;
         }
-        else {
-            return "N/A";
-        }        
+
+        if (title.length>=64) {
+            title = title.substring(0,64)+"..."
+        }
+        return title;
     }
-    function addArticleToTable(article){
+    function addArticleToTable(article, even){
         if (isNaN(parseInt(article.word_count))) return;
 
         var dateObject = new Date();
@@ -108,7 +114,9 @@
         if (isNaN(minutes)) minutes=0;
         if (title=='') title="[title unknown]";
 
-        var articleRow=`<tr>`+
+        var htmlClass = even ? 'even' : 'odd';
+
+        var articleRow=`<tr class="${htmlClass}">`+
             `<td>${added}</td>`+
             `<td class="words">${words}</td>`+
             `<td class="minutes">${minutes} min</td>`+
@@ -158,8 +166,8 @@
 <thead>
     <tr>
         <th>Date added</th>
-        <th class="numeric-sort">Word count</th>
-        <th class="numeric-sort">Time to read</th>
+        <th class="numeric-sort">Words</th>
+        <th class="numeric-sort">Time</th>
         <th>Domain</th>
         <th>Title</th>
     </tr>
