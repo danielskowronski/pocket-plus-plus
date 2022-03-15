@@ -1,6 +1,7 @@
 cherrypy
 #cherrys
 hiredis
+redis
 pocket
 pyyaml
 termcolor
