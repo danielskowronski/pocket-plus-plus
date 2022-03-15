@@ -5,11 +5,13 @@ import yaml
 import json
 from termcolor import colored
 import cherrypy
+from cherrys import cherrys # replace with `import cherrys` when https://github.com/3kwa/cherrys/pull/2 is merged; aletrnatively create new pip package
 import pocket
 from pprint import pprint
 from influxdb import InfluxDBClient
 
 _app_cfg = None
+cherrypy.lib.sessions.RedisSession = cherrys.RedisSession
 
 
 def debugPrint(msg):
@@ -50,37 +52,41 @@ def getSessionItemOrEmpty(name):
 
     return x
 
+
 def processStatistics(articles_data):
-    time=0
-    words=0
-    articles=0
+    time = 0
+    words = 0
+    articles = 0
 
     for article in articles_data.values():
         try:
-            time +=int(article['time_to_read'])
+            time += int(article['time_to_read'])
         except:
             pass
-        
+
         try:
-            words+=int(article['word_count'])
+            words += int(article['word_count'])
         except:
             pass
-        
-        articles+=1
+
+        articles += 1
 
     return time, words, articles
 
-def storeStatsToInfluxDB(username,time,words,articles):
-    if _influx_cfg['enabled']!=True:
+
+def storeStatsToInfluxDB(username, time, words, articles):
+    if _influx_cfg['enabled'] != True:
         return
 
-    debugPrint('Storing stats to InfluxDB: series=%s minutes=%d words=%d articles=%d'%(username,time,words,articles))
-    
-    client=InfluxDBClient(_influx_cfg['host'], _influx_cfg['port'], _influx_cfg['user'], _influx_cfg['pass'], _influx_cfg['db'])
-    status=client.write_points([{
-        "measurement":username, 
-        "fields":{"minutes":time, "words":words, "articles":articles}}])
-    debugPrint('Response from InfluxDB: %s'%(status))
+    debugPrint('Storing stats to InfluxDB: series=%s minutes=%d words=%d articles=%d' % (
+        username, time, words, articles))
+
+    client = InfluxDBClient(_influx_cfg['host'], _influx_cfg['port'],
+                            _influx_cfg['user'], _influx_cfg['pass'], _influx_cfg['db'])
+    status = client.write_points([{
+        "measurement": username,
+        "fields": {"minutes": time, "words": words, "articles": articles}}])
+    debugPrint('Response from InfluxDB: %s' % (status))
     return True
 
 
@@ -98,7 +104,7 @@ class PocketPlusPlus(object):
 
         access_token = user_credentials['access_token']
         cherrypy.session['access_token'] = access_token
-        
+
         username = user_credentials['username']
         cherrypy.session['username'] = username
 
@@ -160,11 +166,12 @@ class PocketPlusPlus(object):
     def articles(self):
         at = getSessionItemOrEmpty('access_token')
         pocket_instance = pocket.Pocket(_app_cfg['consumer_key'], at)
-        articles_data = pocket_instance.get(state='unread', detail=True)[0]['list']
+        articles_data = pocket_instance.get(
+            state='unread', detail=True)[0]['list']
 
         username = getSessionItemOrEmpty('username')
         time, words, count = processStatistics(articles_data)
-        storeStatsToInfluxDB(username, time,words,count)
+        storeStatsToInfluxDB(username, time, words, count)
 
         return articles_data
 
@@ -177,17 +184,37 @@ class PocketPlusPlus(object):
 
 
 if __name__ == '__main__':
-    stream      = open('config.yml', 'r')
-    loadedFile  = yaml.load(stream, Loader=yaml.SafeLoader)
-    _app_cfg    = loadedFile['app_cfg']
+    stream = open('config.yml', 'r')
+    loadedFile = yaml.load(stream, Loader=yaml.SafeLoader)
+    _app_cfg = loadedFile['app_cfg']
     _influx_cfg = loadedFile['influx_cfg']
+    _redis_cfg = loadedFile['redis_cfg']
+    storage_type = 'ram'
+    if _redis_cfg['enabled']:
+        storage_type = 'redis'
 
     debugPrint('Config loaded')
 
     conf = {
         '/': {
             'tools.sessions.on': True,
-            'tools.sessions.timeout': 10080, # 1 week
+            'tools.sessions.storage_type': storage_type,
+            'tools.sessions.timeout': 40320,  # time in minutes; 28 days
+
+            'tools.sessions.host': _redis_cfg['host'],
+            'tools.sessions.port': _redis_cfg['port'],
+            'tools.sessions.ssl': _redis_cfg['ssl'],
+            'tools.sessions.tls_skip_verify': _redis_cfg['tls_skip_verify'],
+
+            'tools.sessions.is_sentinel': _redis_cfg['is_sentinel'],
+            'tools.sessions.sentinel_pass': _redis_cfg['sentinel_pass'],
+            'tools.sessions.sentinel_service': _redis_cfg['sentinel_service'],
+
+            'tools.sessions.db': _redis_cfg['db'],
+            'tools.sessions.prefix': _redis_cfg['prefix'],
+            'tools.sessions.user': _redis_cfg['user'],
+            'tools.sessions.password': _redis_cfg['pass'],
+
             'tools.staticdir.root': os.path.abspath(os.getcwd())
         },
         '/static': {

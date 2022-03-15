@@ -19,7 +19,7 @@ python3 -m pip install -r requirements.txt
 ## Config
 You must use `config.yml` looking like this:
 
-```
+```yaml
 ---
 app_cfg:
   debug: true
@@ -33,6 +33,23 @@ influx_cfg:
   db: ppp
   user: username
   pass: secretpass
+redis_cfg:
+  enabled: true
+
+  is_sentinel: true
+  sentinel_pass: CLIENT_PASS_TO_SENTINEL  
+  sentinel_service: SENTINEL_SERVICE_NAME
+  
+  host: REDIS_HOSTNAME
+  port: 6379
+  ssl: True
+  tls_skip_verify: True
+
+  db: 0
+  prefix: ppp_
+
+  user: REDIS_USER
+  pass: REDIS_PASS
 ```
 
 You need `$TOKEN` being *consumer key* from https://getpocket.com/developer/apps/

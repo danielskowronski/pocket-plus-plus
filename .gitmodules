@@ -1,0 +1,3 @@
+[submodule "cherrys"]
+	path = cherrys
+	url = git@github.com:danielskowronski/cherrys.git
