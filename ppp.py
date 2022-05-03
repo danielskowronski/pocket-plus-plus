@@ -5,7 +5,7 @@ import yaml
 import json
 from termcolor import colored
 import cherrypy
-from cherrys import cherrys # replace with `import cherrys` when https://github.com/3kwa/cherrys/pull/2 is merged; aletrnatively create new pip package
+import cherrys
 import pocket
 from pprint import pprint
 from influxdb import InfluxDBClient
